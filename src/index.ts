@@ -6,28 +6,32 @@
  * transient coding contexts.
  */
 
-import { Server } from '@modelcontextprotocol/sdk/server/index.js';
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-
-const server = new Server(
-  {
-    name: 'institutional-knowledge-mcp',
-    version: '0.1.0',
-  },
-  {
-    capabilities: {},
-  }
-);
+import { initializeDb, runMigrations, closeDb } from './db/schema.js';
+import { createServer } from './mcp/server.js';
 
 async function main() {
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
+  // Initialize database
+  const db = initializeDb('./knowledge.db');
+  runMigrations(db);
+
+  // Create server
+  const server = createServer({
+    database: db,
+    logLevel: 'info',
+  });
+
+  // Connect to stdio transport
+  await server.connect();
 
   // Graceful shutdown
-  process.on('SIGINT', async () => {
+  const shutdown = async () => {
     await server.close();
+    closeDb(db);
     process.exit(0);
-  });
+  };
+
+  process.on('SIGINT', shutdown);
+  process.on('SIGTERM', shutdown);
 }
 
 // Start the server

@@ -1,5 +1,8 @@
-import { initializeDb, runMigrations, closeDb } from "../../src/db/schema";
+import { initializeDb, runMigrations, closeDb as dbClose } from "../../src/db/schema";
 import { unlinkSync, existsSync } from "fs";
+
+// Re-export closeDb for convenience
+export const closeDb = dbClose;
 
 /**
  * Create a fresh in-memory test database

@@ -1,2 +1,2 @@
-// MCP tools module - Placeholder for Issue #4
-export {};
+export { createServer, MCPServer } from './server.js';
+export type { ServerConfig, ServerInfo } from './server.js';
