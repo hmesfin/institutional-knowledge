@@ -1,0 +1,48 @@
+{
+  "name": "institutional-knowledge-mcp",
+  "version": "0.1.0",
+  "description": "MCP server for building persistent institutional knowledge from transient coding contexts",
+  "type": "module",
+  "main": "./build/index.js",
+  "types": "./build/index.d.ts",
+  "bin": {
+    "institutional-knowledge-mcp": "./build/index.js"
+  },
+  "scripts": {
+    "build": "bun build ./src/index.ts --outdir ./build --target bun && bun run build:types",
+    "build:types": "tsc --emitDeclarationOnly",
+    "dev": "bun run ./src/index.ts",
+    "test": "bun test",
+    "test:coverage": "bun test --coverage",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\"",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "knowledge-management",
+    "claude"
+  ],
+  "author": "Hamel Mesfin",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "better-sqlite3": "^11.7.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.12",
+    "@types/node": "^25.2.0",
+    "@typescript-eslint/eslint-plugin": "^8.19.1",
+    "@typescript-eslint/parser": "^8.19.1",
+    "eslint": "^9.18.0",
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
