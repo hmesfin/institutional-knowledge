@@ -1,47 +1,40 @@
 import { describe, it, expect, beforeEach, afterEach } from "bun:test";
-import Database from "bun:sqlite";
-import { existsSync, unlinkSync } from "fs";
-import { initializeDb, runMigrations, migrateDown, closeDb } from "../../src/db/schema";
+import {
+  createTestDb,
+  createTestDbFile,
+  cleanupTestDb,
+  sampleKnowledgeItem,
+  insertSampleKnowledgeItem,
+} from "../utils/test-helpers";
+import { runMigrations, migrateDown, closeDb } from "../../src/db/schema";
 import type { KnowledgeItem } from "../../src/types";
 
 describe("Database Schema", () => {
   const testDbPath = "./test-knowledge.db";
 
-  beforeEach(() => {
-    // Clean up any existing test database
-    if (existsSync(testDbPath)) {
-      unlinkSync(testDbPath);
-    }
-  });
-
   afterEach(() => {
-    // Clean up test database
-    if (existsSync(testDbPath)) {
-      unlinkSync(testDbPath);
-    }
+    // Clean up test database file after each test
+    cleanupTestDb(testDbPath);
   });
 
   describe("Database Initialization", () => {
-    it("should create database file if it doesn't exist", () => {
-      const db = initializeDb(testDbPath);
-      expect(existsSync(testDbPath)).toBe(true);
+    it("should create in-memory database for isolated testing", () => {
+      const db = createTestDb();
+      expect(db).toBeDefined();
       closeDb(db);
     });
 
-    it("should open existing database", () => {
-      const db1 = initializeDb(testDbPath);
-      closeDb(db1);
-
-      const db2 = initializeDb(testDbPath);
-      expect(db2).toBeDefined();
-      closeDb(db2);
+    it("should create file-based test database", () => {
+      const db = createTestDbFile(testDbPath);
+      const { existsSync } = require("fs");
+      expect(existsSync(testDbPath)).toBe(true);
+      closeDb(db);
     });
   });
 
   describe("Migrations", () => {
     it("should create knowledge_items table with all required fields", () => {
-      const db = initializeDb(testDbPath);
-      runMigrations(db);
+      const db = createTestDb();
 
       // Check table exists
       const tableInfo = db
@@ -74,8 +67,7 @@ describe("Database Schema", () => {
     });
 
     it("should create indexes for common queries", () => {
-      const db = initializeDb(testDbPath);
-      runMigrations(db);
+      const db = createTestDb();
 
       // Check indexes exist
       const indexes = db
@@ -92,58 +84,19 @@ describe("Database Schema", () => {
       closeDb(db);
     });
 
-    it("should insert and retrieve knowledge item", () => {
-      const db = initializeDb(testDbPath);
-      runMigrations(db);
+    it("should insert and retrieve knowledge item using test helpers", () => {
+      const db = createTestDb();
 
-      const item: KnowledgeItem = {
-        id: "test-1",
-        project: "test-project",
-        file_context: "src/test.ts",
-        type: "solution",
-        summary: "Test solution",
-        content: "This is a test solution",
-        decision_rationale: "Because it works",
-        alternatives_considered: ["Alternative A", "Alternative B"],
-        solution_verified: true,
-        tags: ["test", "example"],
-        related_issues: ["issue-1", "issue-2"],
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      };
+      // Use test helper to insert sample data
+      const itemId = insertSampleKnowledgeItem(db);
 
-      const insert = db.query(`
-        INSERT INTO knowledge_items (
-          id, project, file_context, type, summary, content,
-          decision_rationale, alternatives_considered, solution_verified,
-          tags, related_issues, created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `);
-
-      insert.run(
-        item.id,
-        item.project,
-        item.file_context,
-        item.type,
-        item.summary,
-        item.content,
-        item.decision_rationale,
-        JSON.stringify(item.alternatives_considered),
-        item.solution_verified ? 1 : 0,
-        JSON.stringify(item.tags),
-        JSON.stringify(item.related_issues),
-        item.created_at,
-        item.updated_at
-      );
-
-      const retrieved = db
-        .query("SELECT * FROM knowledge_items WHERE id = ?")
-        .get(item.id) as any;
+      // Retrieve the item
+      const retrieved = db.query("SELECT * FROM knowledge_items WHERE id = ?").get(itemId) as any;
 
       expect(retrieved).toBeDefined();
-      expect(retrieved.id).toBe(item.id);
-      expect(retrieved.project).toBe(item.project);
-      expect(retrieved.type).toBe(item.type);
+      expect(retrieved.id).toBe(sampleKnowledgeItem.id);
+      expect(retrieved.project).toBe(sampleKnowledgeItem.project);
+      expect(retrieved.type).toBe(sampleKnowledgeItem.type);
       expect(retrieved.solution_verified).toBe(1);
 
       closeDb(db);
@@ -152,8 +105,7 @@ describe("Database Schema", () => {
 
   describe("Migration Down", () => {
     it("should drop knowledge_items table", () => {
-      const db = initializeDb(testDbPath);
-      runMigrations(db);
+      const db = createTestDb();
 
       // Verify table exists
       let tableExists = db
