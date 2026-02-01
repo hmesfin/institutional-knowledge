@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 /**
  * KnowledgeItem type definition
  *
@@ -6,48 +8,81 @@
 
 export type KnowledgeItemType = 'solution' | 'pattern' | 'gotcha' | 'win' | 'troubleshooting';
 
-export interface KnowledgeItem {
-  id: string;
-  project: string;
-  file_context: string;
-  type: KnowledgeItemType;
-  summary: string;
-  content: string;
-  decision_rationale?: string;
-  alternatives_considered?: string[];
-  solution_verified: boolean;
-  tags?: string[];
-  related_issues?: string[];
-  created_at: string;
-  updated_at: string;
-}
+/**
+ * Zod schema for validating knowledge item types
+ */
+export const KnowledgeItemTypeSchema = z.enum([
+  'solution',
+  'pattern',
+  'gotcha',
+  'win',
+  'troubleshooting',
+]);
 
 /**
- * Types for creating/updating knowledge items
+ * Zod schema for ISO date strings
  */
-export interface CreateKnowledgeItem {
-  id?: string;
-  project: string;
-  file_context: string;
-  type: KnowledgeItemType;
-  summary: string;
-  content: string;
-  decision_rationale?: string;
-  alternatives_considered?: string[];
-  solution_verified?: boolean;
-  tags?: string[];
-  related_issues?: string[];
-}
+const IsoDateTimeSchema = z.string().datetime();
 
-export interface UpdateKnowledgeItem {
-  project?: string;
-  file_context?: string;
-  type?: KnowledgeItemType;
-  summary?: string;
-  content?: string;
-  decision_rationale?: string;
-  alternatives_considered?: string[];
-  solution_verified?: boolean;
-  tags?: string[];
-  related_issues?: string[];
-}
+/**
+ * Zod schema for KnowledgeItem
+ * Validates all fields including required and optional
+ */
+export const KnowledgeItemSchema = z.object({
+  id: z.string().min(1),
+  project: z.string().min(1),
+  file_context: z.string().min(1),
+  type: KnowledgeItemTypeSchema,
+  summary: z.string().min(1),
+  content: z.string().min(1),
+  decision_rationale: z.string().optional(),
+  alternatives_considered: z.array(z.string()).optional(),
+  solution_verified: z.boolean(),
+  tags: z.array(z.string()).optional(),
+  related_issues: z.array(z.string()).optional(),
+  created_at: IsoDateTimeSchema,
+  updated_at: IsoDateTimeSchema,
+});
+
+export interface KnowledgeItem extends z.infer<typeof KnowledgeItemSchema> {}
+
+/**
+ * Zod schema for creating a knowledge item
+ * id, created_at, and updated_at are optional (auto-generated)
+ */
+export const CreateKnowledgeItemSchema = z.object({
+  id: z.string().min(1).optional(),
+  project: z.string().min(1),
+  file_context: z.string().min(1),
+  type: KnowledgeItemTypeSchema,
+  summary: z.string().min(1),
+  content: z.string().min(1),
+  decision_rationale: z.string().optional(),
+  alternatives_considered: z.array(z.string()).optional(),
+  solution_verified: z.boolean().optional().default(false),
+  tags: z.array(z.string()).optional(),
+  related_issues: z.array(z.string()).optional(),
+});
+
+export interface CreateKnowledgeItem extends z.infer<typeof CreateKnowledgeItemSchema> {}
+
+/**
+ * Zod schema for updating a knowledge item
+ * All fields optional except immutable ones (id, created_at, updated_at)
+ */
+export const UpdateKnowledgeItemSchema = z
+  .object({
+    project: z.string().min(1).optional(),
+    file_context: z.string().min(1).optional(),
+    type: KnowledgeItemTypeSchema.optional(),
+    summary: z.string().min(1).optional(),
+    content: z.string().min(1).optional(),
+    decision_rationale: z.string().optional(),
+    alternatives_considered: z.array(z.string()).optional(),
+    solution_verified: z.boolean().optional(),
+    tags: z.array(z.string()).optional(),
+    related_issues: z.array(z.string()).optional(),
+  })
+  .strict(); // Prevent adding fields that shouldn't be updated
+
+export interface UpdateKnowledgeItem extends z.infer<typeof UpdateKnowledgeItemSchema> {}
