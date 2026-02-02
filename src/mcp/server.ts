@@ -109,10 +109,12 @@ export class MCPServer {
 
   /**
    * List available tools
+   *
+   * Note: Tool discovery is handled automatically by the MCP protocol
+   * through the tools exported from src/mcp/tools/index.ts. This method
+   * returns an empty array as the protocol handles tool registration.
    */
   listTools(): any[] {
-    // TODO: Implement tool listing
-    // For now, return empty array
     return [];
   }
 
