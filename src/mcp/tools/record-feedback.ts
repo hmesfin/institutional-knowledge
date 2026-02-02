@@ -24,7 +24,32 @@ export const record_feedback_tool = {
     'Record user feedback for confidence scoring. ' +
     'Helps the system learn which detections are valuable over time. ' +
     'Use "confirm" for good detections and "reject" for noise/false positives.',
-  inputSchema: RecordFeedbackInputSchema,
+  inputSchema: {
+    type: 'object' as const,
+    properties: {
+      detection_id: {
+        type: 'string' as const,
+        description: 'Unique ID for this detection',
+      },
+      feedback: {
+        type: 'string' as const,
+        enum: ['confirm', 'reject'],
+        description: 'Confirm (valuable) or reject (noise)',
+      },
+      confidence: {
+        type: 'number' as const,
+        description: 'Confidence score of the detection (0-1)',
+        minimum: 0,
+        maximum: 1,
+      },
+      factors: {
+        type: 'array' as const,
+        items: { type: 'string' as const },
+        description: 'Optional factors that contributed to the score',
+      },
+    },
+    required: ['detection_id', 'feedback', 'confidence'] as const,
+  },
 
   async execute(
     params: RecordFeedbackInput,

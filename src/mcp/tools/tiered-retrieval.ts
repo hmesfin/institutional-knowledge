@@ -111,7 +111,43 @@ export const tiered_retrieval_tool = {
   name: 'tiered_retrieval',
   description:
     'Multi-tier knowledge retrieval with smart capping. Provides increasingly intelligent context delivery from project overview to usage-boosted semantic search.',
-  inputSchema: TieredRetrievalInputSchema,
+  inputSchema: {
+    type: 'object' as const,
+    properties: {
+      query: {
+        type: 'string' as const,
+        description: 'Search query for retrieving relevant knowledge',
+      },
+      project: {
+        type: 'string' as const,
+        description: 'Filter by project name (optional)',
+      },
+      token_budget: {
+        type: 'number' as const,
+        description: 'Maximum tokens to return (default: based on configuration)',
+        minimum: 1000,
+        maximum: 50000,
+      },
+      diversify: {
+        type: 'string' as const,
+        enum: ['none', 'type', 'project', 'both'],
+        description: 'Diversification strategy for results (optional)',
+      },
+      include_tier1: {
+        type: 'boolean' as const,
+        description: 'Include project context (optional)',
+      },
+      include_tier2: {
+        type: 'boolean' as const,
+        description: 'Include recent items (optional)',
+      },
+      include_tier3: {
+        type: 'boolean' as const,
+        description: 'Include semantic search (optional)',
+      },
+    },
+    required: ['query'] as const,
+  },
 
   async execute(
     params: TieredRetrievalInput,

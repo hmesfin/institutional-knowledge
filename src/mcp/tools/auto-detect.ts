@@ -114,7 +114,38 @@ export const auto_detect_tool = {
     'Automatically detect knowledge-worthy moments in text. ' +
     'Identifies patterns like "finally working", "bug found", solutions, gotchas, and wins. ' +
     'Provides confidence scores and suggests knowledge item types.',
-  inputSchema: AutoDetectInputSchema,
+  inputSchema: {
+    type: 'object' as const,
+    properties: {
+      text: {
+        type: 'string' as const,
+        description: 'Text to analyze for knowledge-worthy patterns',
+      },
+      context: {
+        type: 'string' as const,
+        description: 'Additional context to include with the text (optional)',
+      },
+      file_context: {
+        type: 'string' as const,
+        description: 'File or code context where this text comes from (optional)',
+      },
+      project: {
+        type: 'string' as const,
+        description: 'Project name (optional)',
+      },
+      min_confidence: {
+        type: 'number' as const,
+        description: 'Minimum confidence threshold (0-1, default: 0.5)',
+        minimum: 0,
+        maximum: 1,
+      },
+      include_summary: {
+        type: 'boolean' as const,
+        description: 'Include suggested summary (optional, default: true)',
+      },
+    },
+    required: ['text'] as const,
+  },
 
   async execute(
     params: AutoDetectInput,

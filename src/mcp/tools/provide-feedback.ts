@@ -22,7 +22,25 @@ export const provide_feedback_tool = {
     'Provide feedback on auto-captured or detected knowledge items. ' +
     'Confirm valuable items to help the system learn. ' +
     'Reject noise to reduce false positives.',
-  inputSchema: ProvideFeedbackInputSchema,
+  inputSchema: {
+    type: 'object' as const,
+    properties: {
+      item_id: {
+        type: 'string' as const,
+        description: 'ID of the knowledge item to provide feedback on',
+      },
+      action: {
+        type: 'string' as const,
+        enum: ['confirm', 'reject', 'modify'],
+        description: 'Action to take: confirm (valuable), reject (noise), or modify',
+      },
+      comment: {
+        type: 'string' as const,
+        description: 'Optional comment explaining your feedback',
+      },
+    },
+    required: ['item_id', 'action'] as const,
+  },
 
   async execute(
     params: ProvideFeedbackInput,

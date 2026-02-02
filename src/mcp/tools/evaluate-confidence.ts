@@ -105,7 +105,51 @@ export const evaluate_confidence_tool = {
     'Evaluate confidence score for knowledge detection. ' +
     'Multi-factor scoring with tunable thresholds and detailed factor analysis. ' +
     'Helps separate valuable knowledge from noise.',
-  inputSchema: EvaluateConfidenceInputSchema,
+  inputSchema: {
+    type: 'object' as const,
+    properties: {
+      text: {
+        type: 'string' as const,
+        description: 'Text to evaluate for knowledge-worthy content',
+      },
+      preset: {
+        type: 'string' as const,
+        enum: ['conservative', 'moderate', 'aggressive'],
+        description: 'Use preset confidence thresholds (optional)',
+      },
+      custom_high_threshold: {
+        type: 'number' as const,
+        description: 'Custom high threshold (0-1, optional)',
+        minimum: 0,
+        maximum: 1,
+      },
+      custom_medium_threshold: {
+        type: 'number' as const,
+        description: 'Custom medium threshold (0-1, optional)',
+        minimum: 0,
+        maximum: 1,
+      },
+      custom_low_threshold: {
+        type: 'number' as const,
+        description: 'Custom low threshold (0-1, optional)',
+        minimum: 0,
+        maximum: 1,
+      },
+      include_factors: {
+        type: 'boolean' as const,
+        description: 'Include detailed factor breakdown (optional)',
+      },
+      apply_threshold: {
+        type: 'boolean' as const,
+        description: 'Apply threshold filtering to results (optional)',
+      },
+      adjust_weights: {
+        type: 'boolean' as const,
+        description: 'Include weight adjustment information (optional)',
+      },
+    },
+    required: ['text'] as const,
+  },
 
   async execute(
     params: EvaluateConfidenceInput,

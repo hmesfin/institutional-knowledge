@@ -25,7 +25,37 @@ export const semantic_search_tool = {
     'Search for knowledge items by semantic meaning rather than exact keywords. ' +
     'Finds conceptually similar items even without exact matches. ' +
     'Supports filtering by project and type.',
-  inputSchema: SemanticSearchInputSchema,
+  inputSchema: {
+    type: 'object' as const,
+    properties: {
+      query: {
+        type: 'string' as const,
+        description: 'Search query for semantic similarity matching',
+      },
+      limit: {
+        type: 'number' as const,
+        description: 'Maximum number of results to return (default: 10, max: 100)',
+        minimum: 1,
+        maximum: 100,
+      },
+      threshold: {
+        type: 'number' as const,
+        description: 'Minimum similarity threshold (0-1, default: 0.5)',
+        minimum: 0,
+        maximum: 1,
+      },
+      project: {
+        type: 'string' as const,
+        description: 'Filter by project name (optional)',
+      },
+      type: {
+        type: 'string' as const,
+        enum: ['solution', 'pattern', 'gotcha', 'win', 'troubleshooting'],
+        description: 'Filter by knowledge item type (optional)',
+      },
+    },
+    required: ['query'] as const,
+  },
 
   async execute(params: SemanticSearchInput, context: { db: Database }) {
     const { query, limit, threshold, project, type } = params;

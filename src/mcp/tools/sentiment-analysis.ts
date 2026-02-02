@@ -153,7 +153,34 @@ export const analyze_sentiment_tool = {
   description:
     'Analyze sentiment in text to detect problem-solving moments. ' +
     'Tracks sentiment shifts, positive/negative word ratios, and combines with pattern matching for accurate detection.',
-  inputSchema: AnalyzeSentimentInputSchema,
+  inputSchema: {
+    type: 'object' as const,
+    properties: {
+      text: {
+        type: 'string' as const,
+        description: 'Text to analyze for sentiment patterns',
+      },
+      include_timeline: {
+        type: 'boolean' as const,
+        description: 'Include sentiment timeline (optional)',
+      },
+      include_shifts: {
+        type: 'boolean' as const,
+        description: 'Include sentiment shift detection (optional)',
+      },
+      min_shift_delta: {
+        type: 'number' as const,
+        description: 'Minimum sentiment change to register as a shift (0-1, default: 0.3)',
+        minimum: 0,
+        maximum: 1,
+      },
+      combine_with_patterns: {
+        type: 'boolean' as const,
+        description: 'Combine sentiment analysis with pattern detection (optional)',
+      },
+    },
+    required: ['text'] as const,
+  },
 
   async execute(
     params: AnalyzeSentimentInput,

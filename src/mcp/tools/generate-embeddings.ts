@@ -20,7 +20,17 @@ export const generate_embeddings_tool = {
     'Generate embeddings for knowledge items that don\'t have them yet. ' +
     'Use this to backfill embeddings for existing items after enabling semantic search. ' +
     'Process is async and runs in batches for efficiency.',
-  inputSchema: GenerateEmbeddingsInputSchema,
+  inputSchema: {
+    type: 'object' as const,
+    properties: {
+      limit: {
+        type: 'number' as const,
+        description: 'Maximum number of items to process (default: 50, max: 500)',
+        minimum: 1,
+        maximum: 500,
+      },
+    },
+  },
 
   async execute(params: GenerateEmbeddingsInput, context: { db: Database }) {
     const { limit } = params;

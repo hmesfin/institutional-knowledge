@@ -31,7 +31,41 @@ export const auto_capture_tool = {
     'Run end-to-end auto-capture workflow. ' +
     'Detects knowledge moments, evaluates confidence, and optionally auto-saves high-confidence items. ' +
     'Provides notifications and feedback mechanisms for continuous improvement.',
-  inputSchema: AutoCaptureInputSchema,
+  inputSchema: {
+    type: 'object' as const,
+    properties: {
+      text: {
+        type: 'string' as const,
+        description: 'Text to analyze for auto-capture',
+      },
+      threshold: {
+        type: 'number' as const,
+        description: 'Confidence threshold for auto-capture (0-1, default: 0.9)',
+        minimum: 0,
+        maximum: 1,
+      },
+      auto_save: {
+        type: 'boolean' as const,
+        description: 'Automatically save items above threshold (optional, default: false)',
+      },
+      notify: {
+        type: 'boolean' as const,
+        description: 'Show notifications (optional, default: true)',
+      },
+      preset: {
+        type: 'string' as const,
+        enum: ['conservative', 'moderate', 'aggressive'],
+        description: 'Use preset confidence thresholds (optional)',
+      },
+      max_captures: {
+        type: 'number' as const,
+        description: 'Maximum items to capture (default: 5, max: 10)',
+        minimum: 1,
+        maximum: 10,
+      },
+    },
+    required: ['text'] as const,
+  },
 
   async execute(
     params: AutoCaptureInput,
