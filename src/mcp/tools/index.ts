@@ -48,3 +48,8 @@ export {
   auto_detect_tool,
   type AutoDetectInput,
 } from './auto-detect.js';
+
+export {
+  analyze_sentiment_tool,
+  type AnalyzeSentimentInput,
+} from './sentiment-analysis.js';

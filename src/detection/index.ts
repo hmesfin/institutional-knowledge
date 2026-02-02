@@ -17,3 +17,7 @@ export type {
   DetectionResult,
   MatchOptions,
 } from './matcher';
+
+export { detectWithSentiment } from './combined-detector';
+
+export type { CombinedDetectionResult, CombinedDetectionOptions } from './combined-detector';
