@@ -49,6 +49,11 @@ export function runMigrations(db: Database): void {
     migration1_up(db);
     db.query('INSERT INTO _migrations (version) VALUES (1)').run();
   }
+
+  if (currentVersion < 2) {
+    migration2_up(db);
+    db.query('INSERT INTO _migrations (version) VALUES (2)').run();
+  }
 }
 
 /**
@@ -94,6 +99,38 @@ function migration1_down(db: Database): void {
 }
 
 /**
+ * Migration 2: Add embedding columns to knowledge_items table
+ */
+function migration2_up(db: Database): void {
+  db.exec(`
+    ALTER TABLE knowledge_items
+    ADD COLUMN embedding TEXT;
+
+    ALTER TABLE knowledge_items
+    ADD COLUMN embedding_model TEXT;
+
+    ALTER TABLE knowledge_items
+    ADD COLUMN embedding_generated_at TEXT;
+
+    CREATE INDEX IF NOT EXISTS idx_knowledge_items_embedding
+    ON knowledge_items(id) WHERE embedding IS NOT NULL;
+  `);
+}
+
+/**
+ * Rollback migration 2
+ */
+function migration2_down(db: Database): void {
+  db.exec(`
+    DROP INDEX IF EXISTS idx_knowledge_items_embedding;
+
+    ALTER TABLE knowledge_items DROP COLUMN embedding_generated_at;
+    ALTER TABLE knowledge_items DROP COLUMN embedding_model;
+    ALTER TABLE knowledge_items DROP COLUMN embedding;
+  `);
+}
+
+/**
  * Rollback the last migration
  */
 export function migrateDown(db: Database): void {
@@ -104,6 +141,11 @@ export function migrateDown(db: Database): void {
         version: number | null;
       }
     )?.version || 0;
+
+  if (currentVersion >= 2) {
+    migration2_down(db);
+    db.query('DELETE FROM _migrations WHERE version = 2').run();
+  }
 
   if (currentVersion >= 1) {
     migration1_down(db);

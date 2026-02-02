@@ -1,5 +1,5 @@
 import type Database from 'bun:sqlite';
-import type { KnowledgeItem, CreateKnowledgeItem, UpdateKnowledgeItem } from '../types';
+import type { KnowledgeItem, CreateKnowledgeItem, UpdateKnowledgeItem, EmbeddingVector } from '../types';
 
 /**
  * Generate a unique ID for a knowledge item
@@ -46,7 +46,110 @@ export function createKnowledgeItem(db: Database, data: CreateKnowledgeItem): Kn
     timestamp
   );
 
+  // Trigger async embedding generation (non-blocking)
+  triggerEmbeddingGeneration(db, id);
+
   return getKnowledgeItemById(db, id)!;
+}
+
+/**
+ * Update embedding for a knowledge item
+ * @param db - Database instance
+ * @param id - Knowledge item ID
+ * @param embedding - Embedding vector
+ * @param model - Model name used to generate embedding
+ */
+export function updateItemEmbedding(
+  db: Database,
+  id: string,
+  embedding: EmbeddingVector,
+  model: string
+): void {
+  const stmt = db.query(`
+    UPDATE knowledge_items
+    SET embedding = ?,
+        embedding_model = ?,
+        embedding_generated_at = ?
+    WHERE id = ?
+  `);
+
+  stmt.run(
+    JSON.stringify(embedding),
+    model,
+    now(),
+    id
+  );
+}
+
+/**
+ * Get items with embeddings for semantic search
+ * @param db - Database instance
+ * @param filters - Optional filters (project, type)
+ * @returns Array of items with their embeddings
+ */
+export function getItemsWithEmbeddings(
+  db: Database,
+  filters: { project?: string; type?: string } = {}
+): Array<{ item: KnowledgeItem; embedding: EmbeddingVector }> {
+  const conditions: string[] = ['embedding IS NOT NULL'];
+  const values: any[] = [];
+
+  if (filters.project) {
+    conditions.push('project = ?');
+    values.push(filters.project);
+  }
+
+  if (filters.type) {
+    conditions.push('type = ?');
+    values.push(filters.type);
+  }
+
+  const sql = `SELECT * FROM knowledge_items WHERE ${conditions.join(' AND ')}`;
+  const stmt = db.query(sql);
+  const rows = stmt.all(...values) as any[];
+
+  return rows.map((row) => ({
+    item: deserializeRow(row),
+    embedding: JSON.parse(row.embedding) as EmbeddingVector,
+  }));
+}
+
+/**
+ * Get items without embeddings for backfilling
+ * @param db - Database instance
+ * @param limit - Maximum number of items to return
+ * @returns Array of items needing embeddings
+ */
+export function getItemsWithoutEmbeddings(
+  db: Database,
+  limit: number = 50
+): KnowledgeItem[] {
+  const stmt = db.query(`
+    SELECT * FROM knowledge_items
+    WHERE embedding IS NULL
+    ORDER BY created_at DESC
+    LIMIT ?
+  `);
+
+  const rows = stmt.all(limit) as any[];
+  return rows.map(deserializeRow);
+}
+
+/**
+ * Get embedding for a specific item
+ * @param db - Database instance
+ * @param id - Knowledge item ID
+ * @returns Embedding vector or null if not exists
+ */
+export function getItemEmbedding(db: Database, id: string): EmbeddingVector | null {
+  const stmt = db.query('SELECT embedding FROM knowledge_items WHERE id = ?');
+  const row = stmt.get(id) as any;
+
+  if (!row || !row.embedding) {
+    return null;
+  }
+
+  return JSON.parse(row.embedding) as EmbeddingVector;
 }
 
 /**
@@ -236,4 +339,54 @@ function deserializeRow(row: any): KnowledgeItem {
     created_at: row.created_at,
     updated_at: row.updated_at,
   };
+}
+
+/**
+ * Trigger async embedding generation for a knowledge item
+ * Uses setImmediate to avoid blocking the main thread
+ * @param db - Database instance
+ * @param itemId - Knowledge item ID
+ */
+export function triggerEmbeddingGeneration(db: Database, itemId: string): void {
+  setImmediate(async () => {
+    try {
+      const { getEmbeddingService } = await import('../embeddings');
+      const { prepareTextForEmbedding } = await import('../embeddings');
+
+      // Check if database is still open before querying
+      let item;
+      try {
+        item = getKnowledgeItemById(db, itemId);
+      } catch (error) {
+        // Database closed, skip embedding generation
+        if (error instanceof RangeError && error.message.includes('closed database')) {
+          return;
+        }
+        throw error;
+      }
+
+      if (!item) {
+        console.error(`[Embeddings] Item ${itemId} not found`);
+        return;
+      }
+
+      const service = getEmbeddingService();
+      const text = prepareTextForEmbedding(item);
+      const embedding = await service.generateEmbedding(text);
+
+      // Check if database is still open before updating
+      try {
+        updateItemEmbedding(db, itemId, embedding, service.getModelName());
+        console.log(`[Embeddings] Generated embedding for item ${itemId}`);
+      } catch (error) {
+        // Database closed, skip embedding update
+        if (error instanceof RangeError && error.message.includes('closed database')) {
+          return;
+        }
+        throw error;
+      }
+    } catch (error) {
+      console.error(`[Embeddings] Failed to generate embedding for item ${itemId}:`, error);
+    }
+  });
 }

@@ -86,3 +86,35 @@ export const UpdateKnowledgeItemSchema = z
   .strict(); // Prevent adding fields that shouldn't be updated
 
 export interface UpdateKnowledgeItem extends z.infer<typeof UpdateKnowledgeItemSchema> {}
+
+/**
+ * Embedding vector representation
+ * Array of floating point numbers (typically 384 dimensions)
+ */
+export type EmbeddingVector = number[];
+
+/**
+ * Options for semantic search
+ */
+export interface SemanticSearchOptions {
+  /** Query text to search for */
+  query: string;
+  /** Maximum number of results to return (default: 10) */
+  limit?: number;
+  /** Minimum similarity threshold 0-1 (default: 0.5) */
+  threshold?: number;
+  /** Filter by project name */
+  project?: string;
+  /** Filter by knowledge item type */
+  type?: KnowledgeItemType;
+}
+
+/**
+ * Semantic search result with similarity score
+ */
+export interface SemanticSearchResult {
+  /** The knowledge item */
+  item: KnowledgeItem;
+  /** Similarity score (0-1, higher is more similar) */
+  similarity: number;
+}

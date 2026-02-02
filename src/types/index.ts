@@ -7,6 +7,9 @@ export type {
   CreateKnowledgeItem,
   UpdateKnowledgeItem,
   KnowledgeItemType,
+  EmbeddingVector,
+  SemanticSearchOptions,
+  SemanticSearchResult,
 } from './knowledge-item.js';
 
 export {

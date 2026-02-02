@@ -28,3 +28,13 @@ export {
   type DeleteKnowledgeInput,
   type DeleteKnowledgeResult,
 } from './update-delete-knowledge.js';
+
+export {
+  semantic_search_tool,
+  type SemanticSearchInput,
+} from './semantic-search.js';
+
+export {
+  generate_embeddings_tool,
+  type GenerateEmbeddingsInput,
+} from './generate-embeddings.js';
