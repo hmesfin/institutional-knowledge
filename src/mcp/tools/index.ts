@@ -38,3 +38,8 @@ export {
   generate_embeddings_tool,
   type GenerateEmbeddingsInput,
 } from './generate-embeddings.js';
+
+export {
+  tiered_retrieval_tool,
+  type TieredRetrievalInput,
+} from './tiered-retrieval.js';

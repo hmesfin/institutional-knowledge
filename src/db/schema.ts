@@ -54,6 +54,11 @@ export function runMigrations(db: Database): void {
     migration2_up(db);
     db.query('INSERT INTO _migrations (version) VALUES (2)').run();
   }
+
+  if (currentVersion < 3) {
+    migration3_up(db);
+    db.query('INSERT INTO _migrations (version) VALUES (3)').run();
+  }
 }
 
 /**
@@ -131,6 +136,46 @@ function migration2_down(db: Database): void {
 }
 
 /**
+ * Migration 3: Add usage tracking columns to knowledge_items table
+ */
+function migration3_up(db: Database): void {
+  db.exec(`
+    ALTER TABLE knowledge_items
+    ADD COLUMN access_count INTEGER NOT NULL DEFAULT 0;
+
+    ALTER TABLE knowledge_items
+    ADD COLUMN last_accessed_at TEXT;
+
+    ALTER TABLE knowledge_items
+    ADD COLUMN first_accessed_at TEXT;
+
+    CREATE INDEX IF NOT EXISTS idx_knowledge_items_access_count
+    ON knowledge_items(access_count DESC);
+
+    CREATE INDEX IF NOT EXISTS idx_knowledge_items_last_accessed
+    ON knowledge_items(last_accessed_at DESC);
+
+    CREATE INDEX IF NOT EXISTS idx_knowledge_items_project_access
+    ON knowledge_items(project, access_count DESC);
+  `);
+}
+
+/**
+ * Rollback migration 3
+ */
+function migration3_down(db: Database): void {
+  db.exec(`
+    DROP INDEX IF EXISTS idx_knowledge_items_project_access;
+    DROP INDEX IF EXISTS idx_knowledge_items_last_accessed;
+    DROP INDEX IF EXISTS idx_knowledge_items_access_count;
+
+    ALTER TABLE knowledge_items DROP COLUMN first_accessed_at;
+    ALTER TABLE knowledge_items DROP COLUMN last_accessed_at;
+    ALTER TABLE knowledge_items DROP COLUMN access_count;
+  `);
+}
+
+/**
  * Rollback the last migration
  */
 export function migrateDown(db: Database): void {
@@ -141,6 +186,11 @@ export function migrateDown(db: Database): void {
         version: number | null;
       }
     )?.version || 0;
+
+  if (currentVersion >= 3) {
+    migration3_down(db);
+    db.query('DELETE FROM _migrations WHERE version = 3').run();
+  }
 
   if (currentVersion >= 2) {
     migration2_down(db);

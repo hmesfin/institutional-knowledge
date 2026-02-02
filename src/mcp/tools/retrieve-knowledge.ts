@@ -129,6 +129,17 @@ export function getKnowledge(db: Database, input: unknown): GetKnowledgeResult {
     };
   }
 
+  // Track usage for the retrieved item (fire-and-forget)
+  setImmediate(() => {
+    try {
+      const { trackItemAccess } = require('../../db/operations');
+      trackItemAccess(db, id);
+    } catch (error) {
+      // Silently fail to avoid blocking
+      console.error(`Failed to track access for ${id}:`, error);
+    }
+  });
+
   return {
     success: true,
     data: {

@@ -342,6 +342,192 @@ function deserializeRow(row: any): KnowledgeItem {
 }
 
 /**
+ * Track access to a knowledge item
+ * Increments access_count and updates last_accessed_at timestamp
+ * Sets first_accessed_at if this is the first access
+ * @param db - Database instance
+ * @param id - Knowledge item ID
+ */
+export function trackItemAccess(db: Database, id: string): void {
+  const current = getKnowledgeItemById(db, id);
+  if (!current) {
+    return;
+  }
+
+  const stmt = db.query(`
+    UPDATE knowledge_items
+    SET access_count = access_count + 1,
+        last_accessed_at = ?,
+        first_accessed_at = COALESCE(first_accessed_at, ?)
+    WHERE id = ?
+  `);
+
+  const timestamp = now();
+  stmt.run(timestamp, timestamp, id);
+}
+
+/**
+ * Get frequently accessed items
+ * @param db - Database instance
+ * @param options - Query options
+ * @returns Array of frequently accessed knowledge items
+ */
+export interface GetFrequentlyAccessedOptions {
+  project?: string;
+  type?: string;
+  limit?: number;
+  minAccessCount?: number;
+}
+
+export function getFrequentlyAccessedItems(
+  db: Database,
+  options: GetFrequentlyAccessedOptions = {}
+): KnowledgeItem[] {
+  const conditions: string[] = ['access_count > 0'];
+  const values: any[] = [];
+
+  if (options.minAccessCount !== undefined) {
+    conditions.push('access_count >= ?');
+    values.push(options.minAccessCount);
+  }
+
+  if (options.project) {
+    conditions.push('project = ?');
+    values.push(options.project);
+  }
+
+  if (options.type) {
+    conditions.push('type = ?');
+    values.push(options.type);
+  }
+
+  const limit = options.limit || 10;
+
+  const sql = `
+    SELECT * FROM knowledge_items
+    WHERE ${conditions.join(' AND ')}
+    ORDER BY access_count DESC, last_accessed_at DESC
+    LIMIT ?
+  `;
+
+  const stmt = db.query(sql);
+  const rows = stmt.all(...values, limit) as any[];
+
+  return rows.map(deserializeRow);
+}
+
+/**
+ * Get project fingerprint statistics
+ * Provides overview of knowledge distribution for a project
+ * @param db - Database instance
+ * @param project - Project name (optional, if not provided returns global stats)
+ * @returns Project fingerprint with counts by type
+ */
+export interface ProjectFingerprint {
+  project?: string;
+  total_items: number;
+  type_counts: Record<string, number>;
+  most_accessed: Array<{ id: string; summary: string; access_count: number }>;
+  recently_created: Array<{ id: string; summary: string; created_at: string }>;
+}
+
+export function getProjectFingerprint(db: Database, project?: string): ProjectFingerprint {
+  const conditions: string[] = [];
+  const values: any[] = [];
+
+  if (project) {
+    conditions.push('project = ?');
+    values.push(project);
+  }
+
+  const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+
+  // Get total count
+  const totalStmt = db.query(`SELECT COUNT(*) as count FROM knowledge_items ${whereClause}`);
+  const totalResult = totalStmt.get(...values) as { count: number };
+  const total_items = totalResult.count;
+
+  // Get counts by type
+  const typeStmt = db.query(`
+    SELECT type, COUNT(*) as count
+    FROM knowledge_items
+    ${whereClause}
+    GROUP BY type
+    ORDER BY count DESC
+  `);
+  const typeRows = typeStmt.all(...values) as Array<{ type: string; count: number }>;
+  const type_counts: Record<string, number> = {};
+  typeRows.forEach((row) => {
+    type_counts[row.type] = row.count;
+  });
+
+  // Get most accessed items
+  const mostAccessedStmt = db.query(`
+    SELECT id, summary, access_count
+    FROM knowledge_items
+    ${whereClause}
+    ORDER BY access_count DESC, last_accessed_at DESC
+    LIMIT 5
+  `);
+  const most_accessed = mostAccessedStmt.all(...values) as Array<{
+    id: string;
+    summary: string;
+    access_count: number;
+  }>;
+
+  // Get recently created items
+  const recentStmt = db.query(`
+    SELECT id, summary, created_at
+    FROM knowledge_items
+    ${whereClause}
+    ORDER BY created_at DESC
+    LIMIT 5
+  `);
+  const recently_created = recentStmt.all(...values) as Array<{
+    id: string;
+    summary: string;
+    created_at: string;
+  }>;
+
+  return {
+    project,
+    total_items,
+    type_counts,
+    most_accessed,
+    recently_created,
+  };
+}
+
+/**
+ * Get recent wins for a project
+ * @param db - Database instance
+ * @param project - Project name (optional)
+ * @param limit - Maximum number of items to return (default: 5)
+ * @returns Array of recent 'win' type knowledge items
+ */
+export function getRecentWins(db: Database, project?: string, limit: number = 5): KnowledgeItem[] {
+  const conditions: string[] = ["type = 'win'"];
+  const values: any[] = [];
+
+  if (project) {
+    conditions.push('project = ?');
+    values.push(project);
+  }
+
+  const sql = `
+    SELECT * FROM knowledge_items
+    WHERE ${conditions.join(' AND ')}
+    ORDER BY created_at DESC
+    LIMIT ?
+  `;
+
+  const stmt = db.query(sql);
+  const rows = stmt.all(...values, limit) as any[];
+
+  return rows.map(deserializeRow);
+}
+
+/**
  * Trigger async embedding generation for a knowledge item
  * Uses setImmediate to avoid blocking the main thread
  * @param db - Database instance

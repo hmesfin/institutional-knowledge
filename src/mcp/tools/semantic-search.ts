@@ -64,6 +64,19 @@ export const semantic_search_tool = {
         threshold
       );
 
+      // Track usage for returned items (fire-and-forget)
+      setImmediate(() => {
+        const { trackItemAccess } = require('../../db/operations');
+        results.forEach((r: SemanticSearchResult) => {
+          try {
+            trackItemAccess(context.db, r.item.id);
+          } catch (error) {
+            // Silently fail to avoid blocking
+            console.error(`Failed to track access for ${r.item.id}:`, error);
+          }
+        });
+      });
+
       return {
         success: true,
         results: results.map((r: SemanticSearchResult) => ({
