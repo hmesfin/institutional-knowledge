@@ -43,3 +43,8 @@ export {
   tiered_retrieval_tool,
   type TieredRetrievalInput,
 } from './tiered-retrieval.js';
+
+export {
+  auto_detect_tool,
+  type AutoDetectInput,
+} from './auto-detect.js';
