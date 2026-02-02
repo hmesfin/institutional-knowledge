@@ -53,3 +53,13 @@ export {
   analyze_sentiment_tool,
   type AnalyzeSentimentInput,
 } from './sentiment-analysis.js';
+
+export {
+  evaluate_confidence_tool,
+  type EvaluateConfidenceInput,
+} from './evaluate-confidence.js';
+
+export {
+  record_feedback_tool,
+  type RecordFeedbackInput,
+} from './record-feedback.js';
