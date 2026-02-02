@@ -25,6 +25,7 @@ All MCP tools return errors in a consistent format:
 ```
 
 **Example:**
+
 ```typescript
 // Error response
 {
@@ -42,6 +43,7 @@ All MCP tools return errors in a consistent format:
 **Cause:** Required field not provided
 
 **Example:**
+
 ```typescript
 // ❌ Missing required field
 await capture_knowledge({
@@ -51,6 +53,7 @@ await capture_knowledge({
 ```
 
 **Solution:**
+
 ```typescript
 // ✅ Include all required fields
 await capture_knowledge({
@@ -67,6 +70,7 @@ await capture_knowledge({
 **Cause:** Attempting to create item with existing ID
 
 **Solution:**
+
 - Let the system auto-generate IDs (omit `id` field)
 - Or use `update_knowledge` instead of `capture_knowledge`
 
@@ -75,6 +79,7 @@ await capture_knowledge({
 **Cause:** Multiple processes trying to write to SQLite database
 
 **Solutions:**
+
 ```bash
 # 1. Close other connections
 # Make sure you don't have multiple dev servers running
@@ -91,6 +96,7 @@ rm knowledge.db-wal knowledge.db-shm
 **Cause:** Database not initialized or migrations not run
 
 **Solution:**
+
 ```bash
 # Database is auto-initialized on first run
 # If manually creating database, run migrations:
@@ -111,6 +117,7 @@ runMigrations(db);
 **Cause:** Empty or whitespace-only summary
 
 **Solution:**
+
 ```typescript
 // ❌ Bad
 await capture_knowledge({
@@ -130,6 +137,7 @@ await capture_knowledge({
 **Cause:** Type not one of the 5 valid types
 
 **Valid Types:**
+
 - `solution`
 - `pattern`
 - `gotcha`
@@ -137,6 +145,7 @@ await capture_knowledge({
 - `troubleshooting`
 
 **Solution:**
+
 ```typescript
 // ❌ Bad
 await capture_knowledge({
@@ -156,6 +165,7 @@ await capture_knowledge({
 **Cause:** Input text too short for auto-capture analysis
 
 **Solution:**
+
 ```typescript
 // ❌ Too short
 await auto_capture({
@@ -173,6 +183,7 @@ await auto_capture({
 **Cause:** Threshold not between 0 and 1
 
 **Solution:**
+
 ```typescript
 // ❌ Bad
 await auto_capture({
@@ -194,6 +205,7 @@ await auto_capture({
 **Cause:** Semantic search called on items without embeddings
 
 **Solution:**
+
 ```typescript
 // Generate embeddings first
 await generate_embeddings({ force: false });
@@ -209,6 +221,7 @@ await semantic_search({
 **Cause:** Embedding model failed to initialize
 
 **Solutions:**
+
 ```bash
 # 1. Check embeddings cache directory
 ls -la embeddings/cache/
@@ -225,6 +238,7 @@ rm -rf embeddings/cache/*
 **Cause:** Text too long or encoding issue
 
 **Solution:**
+
 ```typescript
 // Content is automatically truncated if too long
 // If issues persist, check for special characters:
@@ -245,6 +259,7 @@ content: content.replace(/[\x00-\x1F\x7F]/g, '')
 **Cause:** Invalid or non-existent item ID
 
 **Solutions:**
+
 ```typescript
 // 1. Verify item exists
 const item = await get_knowledge({ id: "ki-123-abc" });
@@ -265,11 +280,13 @@ console.log(list.data.items);
 **Cause:** Trying to update immutable fields
 
 **Immutable Fields:**
+
 - `id`
 - `created_at`
 - `updated_at` (auto-managed)
 
 **Solution:**
+
 ```typescript
 // ❌ Can't update created_at
 await update_knowledge({
@@ -289,6 +306,7 @@ await update_knowledge({
 **Cause:** Action not one of: `confirm`, `reject`, `modify`
 
 **Solution:**
+
 ```typescript
 // ❌ Bad
 await provide_feedback({
@@ -310,6 +328,7 @@ await provide_feedback({
 **Cause:** Search didn't match any items
 
 **Solutions:**
+
 ```typescript
 // 1. Lower threshold
 await semantic_search({
@@ -331,6 +350,7 @@ await semantic_search({
 **Cause:** Retrieval results exceed token budget
 
 **Solutions:**
+
 ```typescript
 // 1. Increase token budget
 await tiered_retrieval({
@@ -356,6 +376,7 @@ await tiered_retrieval({
 **Cause:** Text doesn't match known patterns
 
 **Solutions:**
+
 ```typescript
 // 1. Lower confidence requirements
 await auto_detect({
@@ -374,6 +395,7 @@ const sentiment = await analyze_sentiment({
 **Cause:** Text encoding or length issues
 
 **Solutions:**
+
 ```typescript
 // 1. Check text length
 if (text.length > 10000) {
@@ -398,6 +420,7 @@ const sentiment = await analyze_sentiment({
 **Symptoms:** Tests pass locally but fail in CI
 
 **Solutions:**
+
 ```bash
 # 1. Clear build artifacts
 rm -rf build/
@@ -415,6 +438,7 @@ bun test
 **Symptoms:** `generate_embeddings` takes too long
 
 **Solutions:**
+
 ```typescript
 // 1. Use smaller batches
 await generate_embeddings({
@@ -434,6 +458,7 @@ ls -lh embeddings/cache/
 **Symptoms:** Search results don't match query
 
 **Solutions:**
+
 ```typescript
 // 1. Regenerate embeddings
 await generate_embeddings({
@@ -457,6 +482,7 @@ await semantic_search({
 **Symptoms:** `auto_capture` never captures items
 
 **Solutions:**
+
 ```typescript
 // 1. Lower threshold
 await auto_capture({
@@ -483,6 +509,7 @@ await auto_capture({
 **Symptoms:** `knowledge.db` file size growing rapidly
 
 **Solutions:**
+
 ```bash
 # 1. Check database size
 ls -lh knowledge.db
@@ -513,6 +540,7 @@ DEBUG=true bun run dev
 ```
 
 This will log:
+
 - SQL queries
 - Embedding generation progress
 - Detection confidence scores
@@ -550,6 +578,7 @@ If you encounter an error not covered here:
 ---
 
 **Related Documentation:**
+
 - [API Reference](./API.md)
 - [Quick Start Guide](./QUICK_START.md)
 - [README](../README.md)

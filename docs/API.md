@@ -4,24 +4,30 @@ Complete API documentation for all Institutional Knowledge MCP server tools.
 
 ## Table of Contents
 
-- [Core CRUD Operations](#core-crud-operations)
-  - [capture_knowledge](#capture_knowledge)
-  - [get_knowledge](#get_knowledge)
-  - [list_knowledge](#list_knowledge)
-  - [update_knowledge](#update_knowledge)
-  - [delete_knowledge](#delete_knowledge)
-- [Search & Retrieval](#search--retrieval)
-  - [semantic_search](#semantic_search)
-  - [generate_embeddings](#generate_embeddings)
-  - [tiered_retrieval](#tiered_retrieval)
-- [Detection & Analysis](#detection--analysis)
-  - [auto_detect](#auto_detect)
-  - [analyze_sentiment](#analyze_sentiment)
-  - [evaluate_confidence](#evaluate_confidence)
-- [Auto-Capture Workflow](#auto-capture-workflow)
-  - [auto_capture](#auto_capture)
-  - [provide_feedback](#provide_feedback)
-  - [record_feedback](#record_feedback)
+- [MCP Tools API Reference](#mcp-tools-api-reference)
+  - [Table of Contents](#table-of-contents)
+  - [Core CRUD Operations](#core-crud-operations)
+    - [capture\_knowledge](#capture_knowledge)
+    - [get\_knowledge](#get_knowledge)
+    - [list\_knowledge](#list_knowledge)
+    - [update\_knowledge](#update_knowledge)
+    - [delete\_knowledge](#delete_knowledge)
+  - [Search \& Retrieval](#search--retrieval)
+    - [semantic\_search](#semantic_search)
+    - [generate\_embeddings](#generate_embeddings)
+    - [tiered\_retrieval](#tiered_retrieval)
+  - [Detection \& Analysis](#detection--analysis)
+    - [auto\_detect](#auto_detect)
+    - [analyze\_sentiment](#analyze_sentiment)
+    - [evaluate\_confidence](#evaluate_confidence)
+  - [Auto-Capture Workflow](#auto-capture-workflow)
+    - [auto\_capture](#auto_capture)
+    - [provide\_feedback](#provide_feedback)
+    - [record\_feedback](#record_feedback)
+  - [Error Handling](#error-handling)
+    - [Common Errors](#common-errors)
+  - [Type Definitions](#type-definitions)
+  - [Quick Start](#quick-start)
 
 ---
 
@@ -32,6 +38,7 @@ Complete API documentation for all Institutional Knowledge MCP server tools.
 Manually save a knowledge item to the database.
 
 **Input Schema:**
+
 ```typescript
 {
   summary: string;              // Required: Brief summary (min 1 char)
@@ -48,6 +55,7 @@ Manually save a knowledge item to the database.
 ```
 
 **Output:**
+
 ```typescript
 {
   success: true;
@@ -66,6 +74,7 @@ Manually save a knowledge item to the database.
 ```
 
 **Error Response:**
+
 ```typescript
 {
   success: false;
@@ -74,6 +83,7 @@ Manually save a knowledge item to the database.
 ```
 
 **Example:**
+
 ```typescript
 // Capture a solution
 const result = await capture_knowledge({
@@ -94,6 +104,7 @@ const result = await capture_knowledge({
 Retrieve a single knowledge item by ID.
 
 **Input Schema:**
+
 ```typescript
 {
   id: string;                   // Required: Knowledge item ID
@@ -101,6 +112,7 @@ Retrieve a single knowledge item by ID.
 ```
 
 **Output:**
+
 ```typescript
 {
   success: true;
@@ -121,6 +133,7 @@ Retrieve a single knowledge item by ID.
 ```
 
 **Error Response:**
+
 ```typescript
 {
   success: false;
@@ -129,6 +142,7 @@ Retrieve a single knowledge item by ID.
 ```
 
 **Example:**
+
 ```typescript
 const item = await get_knowledge({ id: "ki-1234567890-abc123" });
 ```
@@ -140,6 +154,7 @@ const item = await get_knowledge({ id: "ki-1234567890-abc123" });
 List and filter knowledge items with pagination.
 
 **Input Schema:**
+
 ```typescript
 {
   type?: string;                // Optional: Filter by type
@@ -151,6 +166,7 @@ List and filter knowledge items with pagination.
 ```
 
 **Output:**
+
 ```typescript
 {
   success: true;
@@ -170,6 +186,7 @@ List and filter knowledge items with pagination.
 ```
 
 **Example:**
+
 ```typescript
 // List all solutions for a project
 const result = await list_knowledge({
@@ -186,6 +203,7 @@ const result = await list_knowledge({
 Update an existing knowledge item.
 
 **Input Schema:**
+
 ```typescript
 {
   id: string;                   // Required: Item ID
@@ -203,6 +221,7 @@ Update an existing knowledge item.
 ```
 
 **Output:**
+
 ```typescript
 {
   success: true;
@@ -215,6 +234,7 @@ Update an existing knowledge item.
 ```
 
 **Error Response:**
+
 ```typescript
 {
   success: false;
@@ -223,6 +243,7 @@ Update an existing knowledge item.
 ```
 
 **Example:**
+
 ```typescript
 const result = await update_knowledge({
   id: "ki-1234567890-abc123",
@@ -238,6 +259,7 @@ const result = await update_knowledge({
 Delete a knowledge item.
 
 **Input Schema:**
+
 ```typescript
 {
   id: string;                   // Required: Item ID to delete
@@ -245,6 +267,7 @@ Delete a knowledge item.
 ```
 
 **Output:**
+
 ```typescript
 {
   success: true;
@@ -255,6 +278,7 @@ Delete a knowledge item.
 ```
 
 **Error Response:**
+
 ```typescript
 {
   success: false;
@@ -263,6 +287,7 @@ Delete a knowledge item.
 ```
 
 **Example:**
+
 ```typescript
 const result = await delete_knowledge({
   id: "ki-1234567890-abc123"
@@ -278,6 +303,7 @@ const result = await delete_knowledge({
 Search knowledge items by semantic similarity using vector embeddings.
 
 **Input Schema:**
+
 ```typescript
 {
   query: string;                // Required: Search query (min 1 char)
@@ -290,6 +316,7 @@ Search knowledge items by semantic similarity using vector embeddings.
 ```
 
 **Output:**
+
 ```typescript
 {
   success: true;
@@ -309,6 +336,7 @@ Search knowledge items by semantic similarity using vector embeddings.
 ```
 
 **Error Response:**
+
 ```typescript
 {
   success: false;
@@ -321,6 +349,7 @@ Search knowledge items by semantic similarity using vector embeddings.
 ```
 
 **Example:**
+
 ```typescript
 // Search for similar solutions
 const result = await semantic_search({
@@ -337,6 +366,7 @@ const result = await semantic_search({
 Generate vector embeddings for knowledge items that don't have them.
 
 **Input Schema:**
+
 ```typescript
 {
   force?: boolean;              // Optional: Regenerate existing embeddings (default: false)
@@ -345,6 +375,7 @@ Generate vector embeddings for knowledge items that don't have them.
 ```
 
 **Output:**
+
 ```typescript
 {
   success: true;
@@ -359,6 +390,7 @@ Generate vector embeddings for knowledge items that don't have them.
 ```
 
 **Example:**
+
 ```typescript
 const result = await generate_embeddings({
   batch_size: 50
@@ -373,6 +405,7 @@ console.log(`Generated ${result.data.generated} embeddings`);
 Multi-tier knowledge retrieval with smart token budgeting and diversification.
 
 **Input Schema:**
+
 ```typescript
 {
   query: string;                // Required: Search query
@@ -395,6 +428,7 @@ Multi-tier knowledge retrieval with smart token budgeting and diversification.
 ```
 
 **Output:**
+
 ```typescript
 {
   success: true;
@@ -430,6 +464,7 @@ Multi-tier knowledge retrieval with smart token budgeting and diversification.
 ```
 
 **Example:**
+
 ```typescript
 const result = await tiered_retrieval({
   query: "authentication JWT tokens",
@@ -448,6 +483,7 @@ const result = await tiered_retrieval({
 Detect knowledge moments using pattern matching and sentiment analysis.
 
 **Input Schema:**
+
 ```typescript
 {
   text: string;                 // Required: Text to analyze (min 10 chars)
@@ -456,6 +492,7 @@ Detect knowledge moments using pattern matching and sentiment analysis.
 ```
 
 **Output:**
+
 ```typescript
 {
   success: true;
@@ -478,6 +515,7 @@ Detect knowledge moments using pattern matching and sentiment analysis.
 ```
 
 **Example:**
+
 ```typescript
 const result = await auto_detect({
   text: "Finally got it working after hours of debugging!"
@@ -491,6 +529,7 @@ const result = await auto_detect({
 Analyze the sentiment and emotional tone of text.
 
 **Input Schema:**
+
 ```typescript
 {
   text: string;                 // Required: Text to analyze (min 1 char)
@@ -500,6 +539,7 @@ Analyze the sentiment and emotional tone of text.
 ```
 
 **Output:**
+
 ```typescript
 {
   success: true;
@@ -527,6 +567,7 @@ Analyze the sentiment and emotional tone of text.
 ```
 
 **Example:**
+
 ```typescript
 const result = await analyze_sentiment({
   text: "This was terrible and awful. Finally good and working!",
@@ -541,6 +582,7 @@ const result = await analyze_sentiment({
 Evaluate confidence score for text being a valuable knowledge moment.
 
 **Input Schema:**
+
 ```typescript
 {
   text: string;                 // Required: Text to evaluate (min 1 char)
@@ -555,6 +597,7 @@ Evaluate confidence score for text being a valuable knowledge moment.
 ```
 
 **Output:**
+
 ```typescript
 {
   success: true;
@@ -590,6 +633,7 @@ Evaluate confidence score for text being a valuable knowledge moment.
 ```
 
 **Example:**
+
 ```typescript
 const result = await evaluate_confidence({
   text: "Finally working! The solution was to use async/await properly.",
@@ -606,6 +650,7 @@ const result = await evaluate_confidence({
 Run end-to-end auto-capture workflow with configurable options.
 
 **Input Schema:**
+
 ```typescript
 {
   text: string;                 // Required: Text to process (min 50 chars)
@@ -618,6 +663,7 @@ Run end-to-end auto-capture workflow with configurable options.
 ```
 
 **Output:**
+
 ```typescript
 {
   content: Array<{
@@ -628,6 +674,7 @@ Run end-to-end auto-capture workflow with configurable options.
 ```
 
 **Response includes:**
+
 - Auto-Capture Results summary
 - Captured items (if auto_save=true)
 - Flagged for review items
@@ -636,6 +683,7 @@ Run end-to-end auto-capture workflow with configurable options.
 - Next steps
 
 **Example:**
+
 ```typescript
 const result = await auto_capture({
   text: "Finally got it working! The solution was to clear the cache first...",
@@ -652,6 +700,7 @@ const result = await auto_capture({
 Provide feedback on auto-captured or detected knowledge items.
 
 **Input Schema:**
+
 ```typescript
 {
   item_id: string;              // Required: Knowledge item ID
@@ -661,6 +710,7 @@ Provide feedback on auto-captured or detected knowledge items.
 ```
 
 **Output:**
+
 ```typescript
 {
   content: Array<{
@@ -671,11 +721,13 @@ Provide feedback on auto-captured or detected knowledge items.
 ```
 
 **Actions:**
+
 - `confirm`: Mark as valuable, keeps item in database
 - `reject`: Mark as noise, deletes item from database
 - `modify`: Mark for editing, keeps item for manual modification
 
 **Example:**
+
 ```typescript
 const result = await provide_feedback({
   item_id: "ki-1234567890-abc123",
@@ -691,6 +743,7 @@ const result = await provide_feedback({
 Record feedback to improve confidence scoring over time.
 
 **Input Schema:**
+
 ```typescript
 {
   id: string;                   // Required: Detection ID
@@ -701,6 +754,7 @@ Record feedback to improve confidence scoring over time.
 ```
 
 **Output:**
+
 ```typescript
 {
   success: true;
@@ -724,6 +778,7 @@ Record feedback to improve confidence scoring over time.
 ```
 
 **Example:**
+
 ```typescript
 const result = await record_feedback({
   id: "detect-123",

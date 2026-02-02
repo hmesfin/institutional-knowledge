@@ -16,6 +16,7 @@ The Institutional Knowledge MCP server is a production-ready system for capturin
 ### ✅ Completed Features (All 5 Milestones)
 
 #### Milestone 1: Foundation (Issues #1-5)
+
 - [x] Project scaffolding and build system
 - [x] Database schema with migrations (3 migrations)
 - [x] Test infrastructure (Bun test, 426 tests)
@@ -23,18 +24,21 @@ The Institutional Knowledge MCP server is a production-ready system for capturin
 - [x] KnowledgeItem types with Zod validation
 
 #### Milestone 2: Core CRUD (Issues #6-9)
+
 - [x] Database operations (CRUD)
 - [x] capture_knowledge tool
 - [x] get_knowledge & list_knowledge tools
 - [x] update_knowledge & delete_knowledge tools
 
 #### Milestone 3: Semantic Search (Issues #10-12)
+
 - [x] Local embedding model (Transformers.js)
 - [x] Vector storage in SQLite
 - [x] Semantic similarity search
 - [x] Embedding generation and quality metrics
 
 #### Milestone 4: Auto-Detection (Issues #13-17)
+
 - [x] Tiered retrieval strategy (4-tier system)
 - [x] Pattern matching engine (20+ patterns)
 - [x] Sentiment analysis (100+ word lexicon)
@@ -42,6 +46,7 @@ The Institutional Knowledge MCP server is a production-ready system for capturin
 - [x] Auto-capture workflow with feedback
 
 #### Milestone 5: Documentation (Issues #18-20)
+
 - [x] Complete API reference (12 tools documented)
 - [x] Quick start guide
 - [x] Error handling guide
@@ -53,6 +58,7 @@ The Institutional Knowledge MCP server is a production-ready system for capturin
 **14 Production Tools:**
 
 ### Core CRUD (5)
+
 1. `capture_knowledge` - Save knowledge
 2. `get_knowledge` - Retrieve by ID
 3. `list_knowledge` - List with filters
@@ -60,26 +66,31 @@ The Institutional Knowledge MCP server is a production-ready system for capturin
 5. `delete_knowledge` - Delete item
 
 ### Search & Retrieval (3)
+
 6. `semantic_search` - Vector similarity search
-7. `generate_embeddings` - Create embeddings
-8. `tiered_retrieval` - 4-tier smart retrieval
+2. `generate_embeddings` - Create embeddings
+3. `tiered_retrieval` - 4-tier smart retrieval
 
 ### Detection & Analysis (3)
+
 9. `auto_detect` - Pattern + sentiment detection
-10. `analyze_sentiment` - Sentiment analysis
-11. `evaluate_confidence` - Confidence scoring
+2. `analyze_sentiment` - Sentiment analysis
+3. `evaluate_confidence` - Confidence scoring
 
 ### Auto-Capture (3)
+
 12. `auto_capture` - End-to-end workflow
-13. `provide_feedback` - Feedback on items
-14. `record_feedback` - Learn from feedback
+2. `provide_feedback` - Feedback on items
+3. `record_feedback` - Learn from feedback
 
 ## Test Status
 
 **Overall:** 420 passing, 6 failing (98.6% pass rate)
 
 ### Failing Tests (Known Limitations)
+
 All 6 failures are in sentiment analysis edge cases:
+
 - Negation handling (2 tests)
 - Sentiment shift detection (2 tests)
 - Problem-to-solution transition (2 tests)
@@ -87,6 +98,7 @@ All 6 failures are in sentiment analysis edge cases:
 These are subtle NLP edge cases that don't affect core functionality.
 
 ### Test Breakdown
+
 - **Database operations:** ✅ All passing
 - **CRUD tools:** ✅ All passing
 - **Semantic search:** ✅ All passing
@@ -99,12 +111,14 @@ These are subtle NLP edge cases that don't affect core functionality.
 ## Code Quality
 
 ### Build Status
+
 - ✅ TypeScript compilation: No errors
 - ✅ Bundle size: 0.64 MB (271 modules)
 - ✅ Type definitions: Generated
 - ✅ No console errors or warnings
 
 ### Documentation
+
 - ✅ API reference: 1,100+ lines
 - ✅ Quick start: 400+ lines
 - ✅ Error handling: 350+ lines
@@ -112,6 +126,7 @@ These are subtle NLP edge cases that don't affect core functionality.
 - ✅ README: Comprehensive
 
 ### Code Organization
+
 ```
 src/
 ├── auto-capture/    # Auto-capture workflow
@@ -127,6 +142,7 @@ src/
 ## Performance Benchmarks
 
 Expected operation times (typical hardware):
+
 - capture_knowledge: < 50ms
 - get_knowledge: < 20ms
 - list_knowledge: < 100ms
@@ -138,15 +154,18 @@ Expected operation times (typical hardware):
 ## Known Limitations
 
 ### Sentiment Analysis Edge Cases
+
 - Negation phrases may not always be detected correctly
 - Sentiment shift detection works best with clear transitions
 - Problem-to-solution detection requires explicit language
 
 ### Database
+
 - SQLite write concurrency limited (use for single-user)
 - Large knowledge bases (>10K items) may need PostgreSQL
 
 ### Embeddings
+
 - Model requires ~500MB RAM
 - Initial model download on first use
 - Cache directory must be writable
@@ -154,6 +173,7 @@ Expected operation times (typical hardware):
 ## Deployment Readiness
 
 ### ✅ Production Checklist
+
 - [x] All core features implemented
 - [x] Database migrations tested
 - [x] Error handling documented
@@ -164,6 +184,7 @@ Expected operation times (typical hardware):
 - [x] No critical bugs
 
 ### 🚀 Deployment Steps
+
 1. Clone repository
 2. Run `bun install`
 3. Run `bun run build`
@@ -174,6 +195,7 @@ Expected operation times (typical hardware):
 ## Maintenance
 
 ### Dependencies
+
 - Bun (runtime)
 - Transformers.js (embeddings)
 - SQLite (database)
@@ -181,6 +203,7 @@ Expected operation times (typical hardware):
 - All dependencies stable
 
 ### Updating
+
 1. Pull latest changes
 2. Run `bun install`
 3. Run `bun run build`
@@ -190,6 +213,7 @@ Expected operation times (typical hardware):
 ## Future Enhancements
 
 Potential improvements for future versions:
+
 - Web UI for browsing knowledge
 - Export/import functionality
 - Knowledge graph visualization

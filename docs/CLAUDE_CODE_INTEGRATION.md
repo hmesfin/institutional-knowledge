@@ -23,11 +23,13 @@ bun run build
 Create or edit the Claude Code MCP configuration file:
 
 **macOS/Linux:**
+
 ```bash
 ~/.config/claude-code/mcp.json
 ```
 
 **Windows:**
+
 ```
 %APPDATA%\claude-code\mcp.json
 ```
@@ -100,6 +102,7 @@ Claude: That sounds like a valuable knowledge moment! Let me capture it...
 ## Available Tools
 
 ### Core CRUD
+
 - `capture_knowledge` - Save a knowledge item
 - `get_knowledge` - Retrieve by ID
 - `list_knowledge` - List with filters
@@ -107,16 +110,19 @@ Claude: That sounds like a valuable knowledge moment! Let me capture it...
 - `delete_knowledge` - Delete an item
 
 ### Search & Retrieval
+
 - `semantic_search` - Semantic similarity search
 - `generate_embeddings` - Generate vector embeddings
 - `tiered_retrieval` - Smart multi-tier retrieval
 
 ### Detection & Analysis
+
 - `auto_detect` - Detect knowledge moments
 - `analyze_sentiment` - Analyze emotional tone
 - `evaluate_confidence` - Evaluate confidence score
 
 ### Auto-Capture
+
 - `auto_capture` - End-to-end auto-capture
 - `provide_feedback` - Feedback on captured items
 - `record_feedback` - Learn from feedback
@@ -181,6 +187,7 @@ Expected: Claude provides multi-tier results with project overview, semantic mat
 **Error:** "MCP server 'institutional-knowledge' not found"
 
 **Solutions:**
+
 1. Check path in mcp.json is absolute
 2. Verify the server starts: `bun run src/index.ts`
 3. Check Claude Code logs for errors
@@ -191,6 +198,7 @@ Expected: Claude provides multi-tier results with project overview, semantic mat
 **Error:** "database is locked"
 
 **Solutions:**
+
 1. Only one Claude Code instance should access the database
 2. Check for other processes using the database
 3. Delete WAL files: `rm knowledge.db-wal knowledge.db-shm`
@@ -200,6 +208,7 @@ Expected: Claude provides multi-tier results with project overview, semantic mat
 **Error:** Tools don't show up in Claude Code
 
 **Solutions:**
+
 1. Restart Claude Code
 2. Check mcp.json syntax is valid
 3. Verify the server runs without errors
@@ -210,6 +219,7 @@ Expected: Claude provides multi-tier results with project overview, semantic mat
 **Symptoms:** Tools take too long to respond
 
 **Solutions:**
+
 1. Generate embeddings first: Use `generate_embeddings` tool
 2. Use smaller limits in searches
 3. Check system resources (RAM, CPU)
@@ -274,6 +284,7 @@ Capture this for the backend-api project...
 ### 5. Provide Feedback
 
 When auto-capture captures something:
+
 - "confirm" if it's valuable
 - "reject" if it's noise
 - "modify" if it needs editing
@@ -408,6 +419,7 @@ Store database in a secure location:
 ### Access Control
 
 The MCP server runs with your user permissions. Ensure:
+
 - Database file has appropriate permissions (600)
 - Cache directory is not world-writable
 - Sensitive information is tagged appropriately

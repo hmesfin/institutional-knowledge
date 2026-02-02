@@ -178,6 +178,7 @@ The system supports 5 types of knowledge items:
 ## Tips & Best Practices
 
 ### 1. Use Descriptive Summaries
+
 ```typescript
 // ❌ Bad
 summary: "Bug fix"
@@ -187,11 +188,13 @@ summary: "Fix race condition in WebSocket message handler"
 ```
 
 ### 2. Add Relevant Tags
+
 ```typescript
 tags: ["authentication", "jwt", "security", "production"]
 ```
 
 ### 3. Verify Solutions
+
 ```typescript
 {
   type: "solution",
@@ -201,6 +204,7 @@ tags: ["authentication", "jwt", "security", "production"]
 ```
 
 ### 4. Use Projects to Organize
+
 ```typescript
 // Different projects
 project: "frontend-app"
@@ -209,6 +213,7 @@ project: "infrastructure"
 ```
 
 ### 5. Leverage Semantic Search
+
 ```typescript
 // Search with natural language queries
 await semantic_search({
@@ -218,6 +223,7 @@ await semantic_search({
 ```
 
 ### 6. Use Tiered Retrieval for Context
+
 ```typescript
 // Best for AI assistant context
 await tiered_retrieval({
@@ -256,18 +262,21 @@ bun run dev
 ## Troubleshooting
 
 ### Database locked error
+
 ```bash
 # Only one process can access the database at a time
 # Make sure you don't have multiple dev servers running
 ```
 
 ### Embeddings not working
+
 ```typescript
 // Generate embeddings first
 await generate_embeddings({ force: false });
 ```
 
 ### Auto-capture not detecting
+
 ```typescript
 // Try lowering the threshold
 await auto_capture({
