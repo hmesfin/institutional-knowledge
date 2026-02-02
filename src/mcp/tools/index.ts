@@ -63,3 +63,13 @@ export {
   record_feedback_tool,
   type RecordFeedbackInput,
 } from './record-feedback.js';
+
+export {
+  auto_capture_tool,
+  type AutoCaptureInput,
+} from './auto-capture.js';
+
+export {
+  provide_feedback_tool,
+  type ProvideFeedbackInput,
+} from './provide-feedback.js';
