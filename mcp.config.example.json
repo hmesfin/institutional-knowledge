@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "institutional-knowledge": {
+      "command": "bun",
+      "args": [
+        "run",
+        "/absolute/path/to/institutional-knowledge/src/index.ts"
+      ],
+      "env": {
+        "KNOWLEDGE_DB_PATH": "/absolute/path/to/institutional-knowledge/knowledge.db",
+        "EMBEDDINGS_CACHE_DIR": "/absolute/path/to/institutional-knowledge/embeddings/cache"
+      }
+    }
+  }
+}
